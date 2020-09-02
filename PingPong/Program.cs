@@ -8,7 +8,7 @@ namespace PingPong
         {
 
             PingPongServer server = new PingPongServer(8844);
-            server.RunWithTCPListener();
+            server.PersonRecieverTcpListener();
         }
     }
 }

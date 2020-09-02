@@ -38,8 +38,6 @@ namespace PingPongClient
 
                 NetworkStream networkStream = sender.GetStream();
                 IFormatter formatter = new BinaryFormatter(); // the formatter that will serialize my object on my stream 
-                //byte[] messageSent = Encoding.ASCII.GetBytes(msg + " <EOF>");
-                //networkStream.Write(messageSent, 0, messageSent.Length);
                 formatter.Serialize(networkStream, sendPerson);
 
                 // Data buffer 

@@ -21,7 +21,46 @@ namespace PingPong
             localEndPoint = new IPEndPoint(ipAddress, port);
             
         }
-        public void RunWithTCPListener()
+        public void PersonRecieverTcpListener()
+        {
+            TcpListener listener = new TcpListener(localEndPoint.Address, localEndPoint.Port);
+            Console.WriteLine($"Listening on {localEndPoint.Address}:{localEndPoint.Port}");
+            Console.WriteLine("Waiting for connections");
+            listener.Start();
+            while (true)
+            {
+                //---incoming client connected---
+                TcpClient client = listener.AcceptTcpClient();
+                try
+                {
+                    Console.WriteLine("Connected to: {0}:{1} ",
+                        ((IPEndPoint)client.Client.RemoteEndPoint).Address.ToString(),
+                        ((IPEndPoint)client.Client.RemoteEndPoint).Port.ToString());
+                }
+                catch
+                {
+
+                }
+                object obj = new object();
+                ThreadPool.QueueUserWorkItem(obj =>
+                {
+                    //---get the incoming data through a network stream---
+                    NetworkStream nwStream = client.GetStream();
+                    byte[] buffer = new byte[client.ReceiveBufferSize];
+
+                    //---formatting the object to binary
+                    IFormatter formatter = new BinaryFormatter();
+
+                    Person p = (Person)formatter.Deserialize(nwStream); // you have to cast the deserialized object 
+
+                    Console.WriteLine(p.ToString());
+
+                    client.Close();
+                },null);
+            }
+        }
+
+        public void MessageRecieverTcpListener()
         {
             TcpListener listener = new TcpListener(localEndPoint.Address, localEndPoint.Port);
             Console.WriteLine($"Listening on {localEndPoint.Address}:{localEndPoint.Port}");
@@ -49,25 +88,19 @@ namespace PingPong
                     byte[] buffer = new byte[client.ReceiveBufferSize];
 
                     //---read incoming stream---
-                    //int bytesRead = nwStream.Read(buffer, 0, client.ReceiveBufferSize);
+                    int bytesRead = nwStream.Read(buffer, 0, client.ReceiveBufferSize);
 
                     //---convert the data received into a string---
-                    //string dataReceived = Encoding.ASCII.GetString(buffer, 0, bytesRead);
-                    //Console.WriteLine("Received : " + dataReceived);
+                    string dataReceived = Encoding.ASCII.GetString(buffer, 0, bytesRead);
+                    Console.WriteLine("Received : " + dataReceived);
 
                     //---write back the text to the client---
-                    //Console.WriteLine("Sending back : " + dataReceived);
-                    //nwStream.Write(buffer, 0, bytesRead);
-                    IFormatter formatter = new BinaryFormatter();
-
-                    Person p = (Person)formatter.Deserialize(nwStream); // you have to cast the deserialized object 
-
-                    Console.WriteLine(p.ToString());
-
+                    Console.WriteLine("Sending back : " + dataReceived);
+                    nwStream.Write(buffer, 0, bytesRead);
                     client.Close();
-                },null);
+                }, null);
+
             }
-        listener.Stop();
         }
         public void RunWithSockets()
         {
@@ -127,28 +160,6 @@ namespace PingPong
                         }
                         clientSocket.Close();
                     }, null);
-                    // Data Buffer
-                    
-
-                    ////---get the incoming data through a network stream---
-                    //NetworkStream nwStream = client.GetStream();
-                    //byte[] buffer = new byte[client.ReceiveBufferSize];
-
-                    ////---read incoming stream---
-                    //int bytesRead = nwStream.Read(buffer, 0, client.ReceiveBufferSize);
-
-                    ////---convert the data received into a string---
-                    //string dataReceived = Encoding.ASCII.GetString(buffer, 0, bytesRead);
-                    //if (dataReceived.ToLower() == "exit")
-                    //{
-                    //    break;
-                    //}
-                    //Console.WriteLine("Received : " + dataReceived);
-
-                    ////---write back the text to the client---
-                    //Console.WriteLine("Sending back : " + dataReceived);
-                    //nwStream.Write(buffer, 0, bytesRead);
-                    //client.Close();
                 }
             }
             catch(Exception e)
