@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Threading;
 
 namespace PingPongClient
 {
@@ -6,8 +6,9 @@ namespace PingPongClient
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            Thread.Sleep(1000);
+            Client client = new Client(args[0], int.Parse(args[1]));
+            client.Run();
         }
     }
-
 }
