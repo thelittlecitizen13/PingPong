@@ -22,6 +22,7 @@ namespace PingPong
         public void RunWithTCPListener()
         {
             TcpListener listener = new TcpListener(localEndPoint.Address, localEndPoint.Port);
+            Console.WriteLine($"Listening on {localEndPoint.Address}:{localEndPoint.Port}");
             Console.WriteLine("Waiting for connections");
             listener.Start();
             while (true)

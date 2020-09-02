@@ -35,7 +35,7 @@ namespace PingPongClient
 
                 // Recieve a message from the server and print to console 
                 int byteRecv = sender.Receive(messageReceived);
-                Console.WriteLine("Message from Server -> {0}",
+                Console.WriteLine("Message from Server: {0}",
                       Encoding.ASCII.GetString(messageReceived,
                                                  0, byteRecv));
 
