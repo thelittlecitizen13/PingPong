@@ -19,7 +19,48 @@ namespace PingPong
             localEndPoint = new IPEndPoint(ipAddress, port);
             
         }
-        public void Run()
+        public void RunWithTCPListener()
+        {
+            TcpListener listener = new TcpListener(localEndPoint.Address, localEndPoint.Port);
+            Console.WriteLine("Waiting for connections");
+            listener.Start();
+            while (true)
+            {
+                //---incoming client connected---
+                TcpClient client = listener.AcceptTcpClient();
+                try
+                {
+                    Console.WriteLine("Connected to: {0}:{1} ",
+                        ((IPEndPoint)client.Client.RemoteEndPoint).Address.ToString(),
+                        ((IPEndPoint)client.Client.RemoteEndPoint).Port.ToString());
+                }
+                catch
+                {
+
+                }
+                object obj = new object();
+                ThreadPool.QueueUserWorkItem(obj =>
+                {
+                    //---get the incoming data through a network stream---
+                    NetworkStream nwStream = client.GetStream();
+                    byte[] buffer = new byte[client.ReceiveBufferSize];
+
+                    //---read incoming stream---
+                    int bytesRead = nwStream.Read(buffer, 0, client.ReceiveBufferSize);
+
+                    //---convert the data received into a string---
+                    string dataReceived = Encoding.ASCII.GetString(buffer, 0, bytesRead);
+                    Console.WriteLine("Received : " + dataReceived);
+
+                    //---write back the text to the client---
+                    Console.WriteLine("Sending back : " + dataReceived);
+                    nwStream.Write(buffer, 0, bytesRead);
+                    client.Close();
+                },null);
+            }
+        server.Stop();
+        }
+        public void RunWithSockets()
         {
             try
             {
