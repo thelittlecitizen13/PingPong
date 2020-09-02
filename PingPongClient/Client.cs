@@ -19,28 +19,29 @@ namespace PingPongClient
             try
             {
                 // Create the socket to connect the remote server
-                Socket sender = new Socket(serverIp.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+                TcpClient sender = new TcpClient();
                 sender.Connect(serverEndPoint);
-                Console.WriteLine("Connected to: {0} ",
-                          sender.RemoteEndPoint.ToString());
+                NetworkStream networkStream = sender.GetStream();
+                Console.WriteLine("Connected to: {0}:{1} ",
+                          ((IPEndPoint)sender.Client.RemoteEndPoint).Address,
+                          ((IPEndPoint)sender.Client.RemoteEndPoint).Port);
 
                 // Create the message to be sent
                 Console.WriteLine("Please enter your message:");
                 string msg = Console.ReadLine();
                 byte[] messageSent = Encoding.ASCII.GetBytes(msg + " <EOF>");
-                int byteSent = sender.Send(messageSent);
+                networkStream.Write(messageSent, 0, messageSent.Length);
 
                 // Data buffer 
                 byte[] messageReceived = new byte[1024];
 
                 // Recieve a message from the server and print to console 
-                int byteRecv = sender.Receive(messageReceived);
+                int byteRecv = networkStream.Read(messageReceived);
                 Console.WriteLine("Message from Server: {0}",
                       Encoding.ASCII.GetString(messageReceived,
                                                  0, byteRecv));
 
                 // Close Socket  
-                sender.Shutdown(SocketShutdown.Both);
                 sender.Close();
             }
             catch (Exception e)

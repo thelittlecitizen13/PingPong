@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace PingPongClient
+namespace PingPong
 {
     [Serializable]
     public class Person
@@ -18,5 +18,4 @@ namespace PingPongClient
             return $"{_name} is {_age} years old";
         }
     }
-
 }
