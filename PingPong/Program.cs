@@ -6,7 +6,9 @@ namespace PingPong
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+
+            PingPongServer server = new PingPongServer(8844);
+            server.Run();
         }
     }
 }
