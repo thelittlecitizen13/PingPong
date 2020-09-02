@@ -1,14 +1,16 @@
 ﻿using System;
 using System.Net;
 using System.Net.Sockets;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading;
+using PingPong.Data;
 
 namespace PingPong
 {
     public class PingPongServer
     {
-        private TcpListener server;
         private IPEndPoint localEndPoint;
         Socket listener;
         public PingPongServer(int port)
@@ -47,19 +49,25 @@ namespace PingPong
                     byte[] buffer = new byte[client.ReceiveBufferSize];
 
                     //---read incoming stream---
-                    int bytesRead = nwStream.Read(buffer, 0, client.ReceiveBufferSize);
+                    //int bytesRead = nwStream.Read(buffer, 0, client.ReceiveBufferSize);
 
                     //---convert the data received into a string---
-                    string dataReceived = Encoding.ASCII.GetString(buffer, 0, bytesRead);
-                    Console.WriteLine("Received : " + dataReceived);
+                    //string dataReceived = Encoding.ASCII.GetString(buffer, 0, bytesRead);
+                    //Console.WriteLine("Received : " + dataReceived);
 
                     //---write back the text to the client---
-                    Console.WriteLine("Sending back : " + dataReceived);
-                    nwStream.Write(buffer, 0, bytesRead);
+                    //Console.WriteLine("Sending back : " + dataReceived);
+                    //nwStream.Write(buffer, 0, bytesRead);
+                    IFormatter formatter = new BinaryFormatter();
+
+                    Person p = (Person)formatter.Deserialize(nwStream); // you have to cast the deserialized object 
+
+                    Console.WriteLine(p.ToString());
+
                     client.Close();
                 },null);
             }
-        server.Stop();
+        listener.Stop();
         }
         public void RunWithSockets()
         {
@@ -142,7 +150,6 @@ namespace PingPong
                     //nwStream.Write(buffer, 0, bytesRead);
                     //client.Close();
                 }
-                server.Stop();
             }
             catch(Exception e)
             {

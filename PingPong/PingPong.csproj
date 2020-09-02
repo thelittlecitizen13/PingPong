@@ -5,4 +5,10 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Reference Include="PingPong.Data">
+      <HintPath>..\..\..\..\Users\thelittlecitizen13\Desktop\PingPong.Data.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>

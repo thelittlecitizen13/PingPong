@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Net;
 using System.Net.Sockets;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
+using PingPong.Data;
 
 namespace PingPongClient
 {
@@ -21,16 +24,23 @@ namespace PingPongClient
                 // Create the socket to connect the remote server
                 TcpClient sender = new TcpClient();
                 sender.Connect(serverEndPoint);
-                NetworkStream networkStream = sender.GetStream();
+                
                 Console.WriteLine("Connected to: {0}:{1} ",
                           ((IPEndPoint)sender.Client.RemoteEndPoint).Address,
                           ((IPEndPoint)sender.Client.RemoteEndPoint).Port);
 
                 // Create the message to be sent
-                Console.WriteLine("Please enter your message:");
-                string msg = Console.ReadLine();
-                byte[] messageSent = Encoding.ASCII.GetBytes(msg + " <EOF>");
-                networkStream.Write(messageSent, 0, messageSent.Length);
+                Console.WriteLine("Please enter person`s name:");
+                string name = Console.ReadLine();
+                Console.WriteLine("Please enter person`s age:");
+                int age = int.Parse(Console.ReadLine());
+                Person sendPerson = new Person(name, age);
+
+                NetworkStream networkStream = sender.GetStream();
+                IFormatter formatter = new BinaryFormatter(); // the formatter that will serialize my object on my stream 
+                //byte[] messageSent = Encoding.ASCII.GetBytes(msg + " <EOF>");
+                //networkStream.Write(messageSent, 0, messageSent.Length);
+                formatter.Serialize(networkStream, sendPerson);
 
                 // Data buffer 
                 byte[] messageReceived = new byte[1024];
